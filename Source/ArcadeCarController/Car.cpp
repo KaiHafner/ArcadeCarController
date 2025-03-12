@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include <EnhancedInputComponent.h>
+#include <EnhancedInputSubsystems.h>
 
 
 // Sets default values
@@ -27,10 +28,20 @@ void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-    //Setting Bindings
-    UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+    //Add input mapping context
+    if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
+        //Gets local player subsystem
+        if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+        {
+            //Add input context
+            Subsystem->AddMappingContext(InputMapping, 0);
+        }
+    }
 
-    Input->BindAction(Accelerate, ETriggerEvent::Triggered, this, &ACar::ApplyAcceleration);
+    if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+    {
+        Input->BindAction(Accelerate, ETriggerEvent::Triggered, this, &ACar::ApplyAcceleration);
+    }
 }
 
 void ACar::BeginPlay()

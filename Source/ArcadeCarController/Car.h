@@ -19,6 +19,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputMappingContext* InputMapping;
+
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* Accelerate;
 
 public:
