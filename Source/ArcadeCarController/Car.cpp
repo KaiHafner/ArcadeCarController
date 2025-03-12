@@ -110,12 +110,23 @@ void ACar::ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime)
 
 void ACar::ApplyAcceleration()
 {
-    GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed");
+    FVector Velocity = CarBody->GetPhysicsLinearVelocity();
+    float CurrentSpeed = Velocity.Size();
 
-    FVector ForceDirection = GetActorForwardVector(); //Get the forward direction of the car
-    float ForceMagnitude = 100000.0f; //Adjust this value based on your needs
-    FVector ForceToApply = ForceDirection * ForceMagnitude;
-    CarBody->AddForce(ForceToApply);
+    if (CurrentSpeed < MaxSpeed)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Accelerating");
+
+        FVector ForceDirection = GetActorForwardVector();
+        float ForceMagnitude = 1000000.0f;
+        FVector ForceToApply = ForceDirection * ForceMagnitude;
+
+        CarBody->AddForce(ForceToApply);
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Max Speed Reached!");
+    }
 }
 
 

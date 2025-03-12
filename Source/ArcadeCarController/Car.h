@@ -42,6 +42,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Suspension")
 	float SuspensionDamping = 1000.0f; //Higher = less bounce
 
+	//De-acceleration
+	UPROPERTY(EditAnywhere, Category = "Friction")
+	float MaxSpeed = 1000.0f;
+
 	//Wheels
 	UPROPERTY(VisibleAnywhere, Category = "Locations")
 	USceneComponent* WheelFL; //Front Left Wheel
