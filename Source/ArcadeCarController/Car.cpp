@@ -4,6 +4,8 @@
 #include "Car.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
+#include <EnhancedInputComponent.h>
+
 
 // Sets default values
 ACar::ACar()
@@ -21,7 +23,16 @@ ACar::ACar()
     WheelRR = nullptr;
 }
 
-// Called when the game starts or when spawned
+void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    //Setting Bindings
+    UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+    Input->BindAction(Accelerate, ETriggerEvent::Triggered, this, &ACar::ApplyAcceleration);
+}
+
 void ACar::BeginPlay()
 {
     Super::BeginPlay();
@@ -33,7 +44,6 @@ void ACar::BeginPlay()
     WheelRR = Cast<USceneComponent>(GetDefaultSubobjectByName(TEXT("RR_Wheel")));
 }
 
-// Called every frame
 void ACar::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -44,7 +54,6 @@ void ACar::Tick(float DeltaTime)
     ApplySuspensionForce(WheelRR->GetComponentLocation(), DeltaTime);
 
 }
-
 
 void ACar::ApplySuspensionForce(FVector WheelLocation, float DeltaTime)
 {
@@ -86,11 +95,10 @@ void ACar::ApplySuspensionForce(FVector WheelLocation, float DeltaTime)
     }
 }
 
-// Called to bind functionality to input
-void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ACar::ApplyAcceleration()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+    GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed");
 }
+
 
 

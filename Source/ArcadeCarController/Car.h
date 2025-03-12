@@ -18,6 +18,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* Accelerate;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -52,4 +55,6 @@ private:
 
 	//Helper function for suspension
 	void ApplySuspensionForce(FVector WheelLocation, float DeltaTime);
+	void ApplyAcceleration();
+
 };
