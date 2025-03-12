@@ -59,21 +59,24 @@ void ACar::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    ApplySuspensionForce(WheelFL->GetComponentLocation(), DeltaTime);
-    ApplySuspensionForce(WheelFR->GetComponentLocation(), DeltaTime);
-    ApplySuspensionForce(WheelRL->GetComponentLocation(), DeltaTime);
-    ApplySuspensionForce(WheelRR->GetComponentLocation(), DeltaTime);
+    ApplySuspensionForce(WheelFL, DeltaTime);
+    ApplySuspensionForce(WheelFR, DeltaTime);
+    ApplySuspensionForce(WheelRL, DeltaTime);
+    ApplySuspensionForce(WheelRR, DeltaTime);
 
 }
 
-void ACar::ApplySuspensionForce(FVector WheelLocation, float DeltaTime)
+void ACar::ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime)
 {
+    if (!WheelLocation) return;
+
     FHitResult HitResult;
     FCollisionQueryParams QueryParams;
-    QueryParams.AddIgnoredActor(this); //Ignore the car itself
+    QueryParams.AddIgnoredActor(this);
 
-    FVector RayStart = WheelLocation;
-    FVector RayEnd = RayStart - FVector(0, 0, SuspensionRest); //Always cast straight down in world space
+    FVector RayStart = WheelLocation->GetComponentLocation(); 
+    FVector RayDirection = -WheelLocation->GetUpVector();
+    FVector RayEnd = RayStart + (RayDirection * SuspensionRest);
 
     //Perform raycast
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, RayStart, RayEnd, ECC_Visibility, QueryParams);
@@ -83,25 +86,24 @@ void ACar::ApplySuspensionForce(FVector WheelLocation, float DeltaTime)
         isGrounded = true;
 
         float Compression = SuspensionRest - HitResult.Distance; //Suspension compression
-        float SpringForce = SuspensionStiffness * Compression; //hookes Law
-        float Velocity = FVector::DotProduct(GetVelocity(), FVector(0, 0, 1)); //Vertical velocity only
+        float SpringForce = SuspensionStiffness * Compression; //Hookes Law
+        float Velocity = FVector::DotProduct(GetVelocity(), WheelLocation->GetUpVector()); //Vertical velocity relative to wheel
         float DampingForce = SuspensionDamping * Velocity;
 
-        FVector Force = FVector(0, 0, SpringForce - DampingForce); //apply force only upwards
+        FVector Force = WheelLocation->GetUpVector() * (SpringForce - DampingForce); //Apply force along the wheels up direction
 
-        CarBody->AddForceAtLocation(Force, WheelLocation);
+        CarBody->AddForceAtLocation(Force, WheelLocation->GetComponentLocation());
 
-        //Debug draw - Raycast
         DrawDebugLine(GetWorld(), RayStart, HitResult.Location, FColor::Green, false, 0.1f, 0, 2);
         DrawDebugPoint(GetWorld(), HitResult.Location, 5, FColor::Red, false, 0.1f);
 
-        //Debug arrow showing force direction
-        DrawDebugDirectionalArrow(GetWorld(), WheelLocation, WheelLocation + (Force * 0.001f), 100.0f, FColor::Blue, false, 0.1f, 0, 3.0f);
+        DrawDebugDirectionalArrow(GetWorld(), WheelLocation->GetComponentLocation(),
+            WheelLocation->GetComponentLocation() + (Force * 0.001f),
+            100.0f, FColor::Blue, false, 0.1f, 0, 3.0f);
     }
     else
     {
         isGrounded = false;
-        //draw a failed line in red
         DrawDebugLine(GetWorld(), RayStart, RayEnd, FColor::Red, false, 0.1f, 0, 2);
     }
 }
@@ -110,8 +112,8 @@ void ACar::ApplyAcceleration()
 {
     GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed");
 
-    FVector ForceDirection = GetActorForwardVector(); // Get the forward direction of the car
-    float ForceMagnitude = 10000.0f; // Adjust this value based on your needs
+    FVector ForceDirection = GetActorForwardVector(); //Get the forward direction of the car
+    float ForceMagnitude = 100000.0f; //Adjust this value based on your needs
     FVector ForceToApply = ForceDirection * ForceMagnitude;
     CarBody->AddForce(ForceToApply);
 }

@@ -57,7 +57,7 @@ private:
 
 
 	//Helper function for suspension
-	void ApplySuspensionForce(FVector WheelLocation, float DeltaTime);
+	void ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime);
 	void ApplyAcceleration();
 
 };
