@@ -109,6 +109,11 @@ void ACar::ApplySuspensionForce(FVector WheelLocation, float DeltaTime)
 void ACar::ApplyAcceleration()
 {
     GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Pressed");
+
+    FVector ForceDirection = GetActorForwardVector(); // Get the forward direction of the car
+    float ForceMagnitude = 10000.0f; // Adjust this value based on your needs
+    FVector ForceToApply = ForceDirection * ForceMagnitude;
+    CarBody->AddForce(ForceToApply);
 }
 
 
