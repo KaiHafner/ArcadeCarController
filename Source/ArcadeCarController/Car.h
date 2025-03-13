@@ -82,4 +82,5 @@ private:
 	void ApplyBrake();
 	void ApplySteering(const FInputActionValue& Value);
 	void ApplyFriction(float DeltaTime);
+	void Tilt();
 };

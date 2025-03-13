@@ -172,17 +172,23 @@ void ACar::ApplyBrake()
 
 void ACar::ApplySteering(const FInputActionValue& Value)
 {
-    if (isGrounded) 
+    if (isGrounded)
     {
-        float SteeringInput = Value.Get<float>();
+        FVector Velocity = CarBody->GetPhysicsLinearVelocity();
+        float SpeedX = FMath::Abs(Velocity.X); // Only the X-component is considered
 
-        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Green, FString::Printf(TEXT("Steering Input: %f"), SteeringInput));
-        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Steering");
-
-        if (FMath::Abs(SteeringInput) > 0.1f)
+        if (SpeedX > 0.5f)
         {
-            FVector Torque = FVector(0.0f, 0.0f, SteeringInput * steerStrength);
-            CarBody->AddTorqueInRadians(Torque, NAME_None, true);
+            float SteeringInput = Value.Get<float>();
+
+            //GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Green, FString::Printf(TEXT("Steering Input: %f"), SteeringInput));
+            //GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Steering");
+
+            if (FMath::Abs(SteeringInput) > 0.1f)
+            {
+                FVector Torque = FVector(0.0f, 0.0f, SteeringInput * steerStrength);
+                CarBody->AddTorqueInRadians(Torque, NAME_None, true);
+            }
         }
     }
 }
@@ -191,11 +197,8 @@ void ACar::ApplyFriction(float DeltaTime)
 {
     FVector Velocity = CarBody->GetPhysicsLinearVelocity();
     float Speed = Velocity.Size();
-
-    // Simple drag (opposite of velocity) to slow down the car
     FVector DragForce = -Velocity.GetSafeNormal() * Speed * FrictionStrength;
 
-    // Apply the drag force to slow down the car
     CarBody->AddForce(DragForce);
 }
 
