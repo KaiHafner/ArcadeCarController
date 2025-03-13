@@ -42,7 +42,7 @@ void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
     {
         Input->BindAction(Accelerate, ETriggerEvent::Triggered, this, &ACar::ApplyAcceleration);
         Input->BindAction(Brake, ETriggerEvent::Triggered, this, &ACar::ApplyBrake);
-
+        Input->BindAction(Steering, ETriggerEvent::Triggered, this, &ACar::ApplySteering);
     }
 }
 
@@ -66,6 +66,15 @@ void ACar::Tick(float DeltaTime)
     ApplySuspensionForce(WheelRL, DeltaTime);
     ApplySuspensionForce(WheelRR, DeltaTime);
 
+}
+
+//Not in use yet, check grounded apply accel, decell and turning
+void ACar::Movement() 
+{
+    if (isGrounded) 
+    {
+
+    }
 }
 
 void ACar::ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime)
@@ -117,7 +126,7 @@ void ACar::ApplyAcceleration()
 
     if (CurrentSpeed < MaxSpeed)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Accelerating");
+        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Accelerating");
 
         FVector ForceDirection = GetActorForwardVector();
         float ForceMagnitude = 1000000.0f;
@@ -127,10 +136,11 @@ void ACar::ApplyAcceleration()
     }
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Max Speed Reached!");
+        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, "Max Speed Reached!");
     }
 }
 
+//Temporary Reversing (Brakes for now)
 void ACar::ApplyBrake()
 {
     FVector Velocity = CarBody->GetPhysicsLinearVelocity();
@@ -138,7 +148,7 @@ void ACar::ApplyBrake()
 
     if (CurrentSpeed < MaxSpeed)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Reversing");
+        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Reversing");
 
         FVector ForceDirection = GetActorForwardVector();
         float ForceMagnitude = 1000000.0f;
@@ -148,7 +158,21 @@ void ACar::ApplyBrake()
     }
     else
     {
-        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Max Reverse Speed Reached!");
+        GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, "Max Reverse Speed Reached!");
+    }
+}
+
+void ACar::ApplySteering(const FInputActionValue& Value)
+{
+    float SteeringInput = Value.Get<float>();
+
+    GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Green, FString::Printf(TEXT("Steering Input: %f"), SteeringInput));
+    GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Steering");
+
+    if (FMath::Abs(SteeringInput) > 0.1f)
+    {
+        FVector Torque = FVector(0.0f, 0.0f, SteeringInput * steerStrength);
+        CarBody->AddTorqueInRadians(Torque, NAME_None, true);
     }
 }
 
