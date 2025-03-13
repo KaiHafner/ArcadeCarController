@@ -47,6 +47,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Suspension")
 	float SuspensionDamping = 1000.0f; //Higher = less bounce
 
+
 	//Speed Controls
 	UPROPERTY(EditAnywhere, Category = "Friction")
 	float MaxSpeed = 1000.0f;
@@ -56,6 +57,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Friction")
 	float FrictionStrength = 0.5f;
+
 
 	//Steering Controls
 	UPROPERTY(EditAnywhere, Category = "Steering")
