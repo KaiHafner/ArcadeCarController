@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* Accelerate;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* Brake;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -42,7 +45,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Suspension")
 	float SuspensionDamping = 1000.0f; //Higher = less bounce
 
-	//De-acceleration
+	//Speed Controls
 	UPROPERTY(EditAnywhere, Category = "Friction")
 	float MaxSpeed = 1000.0f;
 
@@ -63,5 +66,6 @@ private:
 	//Helper function for suspension
 	void ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime);
 	void ApplyAcceleration();
+	void ApplyBrake();
 
 };

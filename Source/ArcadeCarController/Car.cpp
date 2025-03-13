@@ -41,6 +41,8 @@ void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
     if (UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
     {
         Input->BindAction(Accelerate, ETriggerEvent::Triggered, this, &ACar::ApplyAcceleration);
+        Input->BindAction(Brake, ETriggerEvent::Triggered, this, &ACar::ApplyBrake);
+
     }
 }
 
@@ -98,8 +100,8 @@ void ACar::ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime)
         DrawDebugPoint(GetWorld(), HitResult.Location, 5, FColor::Red, false, 0.1f);
 
         DrawDebugDirectionalArrow(GetWorld(), WheelLocation->GetComponentLocation(),
-            WheelLocation->GetComponentLocation() + (Force * 0.001f),
-            100.0f, FColor::Blue, false, 0.1f, 0, 3.0f);
+        WheelLocation->GetComponentLocation() + (Force * 0.001f),
+        100.0f, FColor::Blue, false, 0.1f, 0, 3.0f);
     }
     else
     {
@@ -119,13 +121,34 @@ void ACar::ApplyAcceleration()
 
         FVector ForceDirection = GetActorForwardVector();
         float ForceMagnitude = 1000000.0f;
-        FVector ForceToApply = ForceDirection * ForceMagnitude;
+        FVector ForceToApply = ForceDirection * ForceMagnitude; 
 
         CarBody->AddForce(ForceToApply);
     }
     else
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Max Speed Reached!");
+    }
+}
+
+void ACar::ApplyBrake()
+{
+    FVector Velocity = CarBody->GetPhysicsLinearVelocity();
+    float CurrentSpeed = Velocity.Size();
+
+    if (CurrentSpeed < MaxSpeed)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Reversing");
+
+        FVector ForceDirection = GetActorForwardVector();
+        float ForceMagnitude = 1000000.0f;
+        FVector ForceToApply = ForceDirection * ForceMagnitude;
+
+        CarBody->AddForce(-ForceToApply);
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Max Reverse Speed Reached!");
     }
 }
 
