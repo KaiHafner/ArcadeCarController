@@ -119,11 +119,14 @@ void ACar::ApplyAcceleration()
 
         if (CurrentSpeed < MaxSpeed)
         {
+            //Set acceleration speed curve
+            static float localAcceleration = FMath::FInterpTo(localAcceleration, 1.0f, GetWorld()->GetDeltaSeconds(), 0.5f);
+
             GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Accelerating");
 
             FVector ForceDirection = GetActorForwardVector();
-            float ForceMagnitude = 1000000.0f;
-            FVector ForceToApply = ForceDirection * ForceMagnitude;
+            float ForceMagnitude = 100000.0f;
+            FVector ForceToApply = ForceDirection * ForceMagnitude * localAcceleration * CarBody->GetMass();
 
             CarBody->AddForce(ForceToApply);
         }
