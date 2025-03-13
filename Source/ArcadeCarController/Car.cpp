@@ -61,10 +61,16 @@ void ACar::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    //Suspension Forces
     ApplySuspensionForce(WheelFL, DeltaTime);
     ApplySuspensionForce(WheelFR, DeltaTime);
     ApplySuspensionForce(WheelRL, DeltaTime);
     ApplySuspensionForce(WheelRR, DeltaTime);
+
+    //Friction Forces
+    ApplyFriction(DeltaTime);
+
+    GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::White, FString::Printf(TEXT("Car Position: %s"), *GetActorLocation().ToString()));
 
 }
 
@@ -117,17 +123,16 @@ void ACar::ApplyAcceleration()
         FVector Velocity = CarBody->GetPhysicsLinearVelocity();
         float CurrentSpeed = Velocity.Size();
 
-        if (CurrentSpeed < MaxSpeed)
+        if (CurrentSpeed <= MaxSpeed)
         {
             //Set acceleration speed curve
-            static float localAcceleration = FMath::FInterpTo(localAcceleration, 1.0f, GetWorld()->GetDeltaSeconds(), 0.5f);
+            Acceleration = FMath::FInterpTo(Acceleration, 1.0f, GetWorld()->GetDeltaSeconds(), 0.5f);
 
             GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Accelerating");
 
             FVector ForceDirection = GetActorForwardVector();
-            float ForceMagnitude = 100000.0f;
-            FVector ForceToApply = ForceDirection * ForceMagnitude * localAcceleration * CarBody->GetMass();
-
+            float ForceMagnitude = 1000.0f;
+            FVector ForceToApply = ForceDirection * ForceMagnitude * Acceleration * CarBody->GetMass();
             CarBody->AddForce(ForceToApply);
         }
         else
@@ -140,24 +145,27 @@ void ACar::ApplyAcceleration()
 //Temporary Reversing (Brakes for now)
 void ACar::ApplyBrake()
 {
-    if (isGrounded) 
+    if (isGrounded)
     {
         FVector Velocity = CarBody->GetPhysicsLinearVelocity();
         float CurrentSpeed = Velocity.Size();
 
-        if (CurrentSpeed < MaxSpeed)
+        if (CurrentSpeed <= MaxSpeed)
         {
+            //Set acceleration speed curve
+            Acceleration = FMath::FInterpTo(Acceleration, 1.0f, GetWorld()->GetDeltaSeconds(), 0.5f);
+
             GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, "Reversing");
 
             FVector ForceDirection = GetActorForwardVector();
-            float ForceMagnitude = 1000000.0f;
-            FVector ForceToApply = ForceDirection * ForceMagnitude;
+            float ForceMagnitude = 1000.0f;
+            FVector ForceToApply = ForceDirection * ForceMagnitude * Acceleration * CarBody->GetMass();
 
             CarBody->AddForce(-ForceToApply);
         }
         else
         {
-            GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, "Max Reverse Speed Reached!");
+            GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Yellow, "Max Speed Reached!");
         }
     }
 }
@@ -177,6 +185,18 @@ void ACar::ApplySteering(const FInputActionValue& Value)
             CarBody->AddTorqueInRadians(Torque, NAME_None, true);
         }
     }
+}
+
+void ACar::ApplyFriction(float DeltaTime)
+{
+    FVector Velocity = CarBody->GetPhysicsLinearVelocity();
+    float Speed = Velocity.Size();
+
+    // Simple drag (opposite of velocity) to slow down the car
+    FVector DragForce = -Velocity.GetSafeNormal() * Speed * FrictionStrength;
+
+    // Apply the drag force to slow down the car
+    CarBody->AddForce(DragForce);
 }
 
 

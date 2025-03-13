@@ -51,9 +51,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Friction")
 	float MaxSpeed = 1000.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Friction")
+	float Acceleration = 1.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Friction")
+	float FrictionStrength = 0.5f;
+
 	//Steering Controls
 	UPROPERTY(EditAnywhere, Category = "Steering")
-	float steerStrength;
+	float steerStrength = 10.0f;
 
 
 	//Wheels
@@ -75,4 +81,5 @@ private:
 	void ApplyAcceleration();
 	void ApplyBrake();
 	void ApplySteering(const FInputActionValue& Value);
+	void ApplyFriction(float DeltaTime);
 };
