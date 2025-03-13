@@ -75,6 +75,4 @@ private:
 	void ApplyAcceleration();
 	void ApplyBrake();
 	void ApplySteering(const FInputActionValue& Value);
-	void Movement();
-
 };
