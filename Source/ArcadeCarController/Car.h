@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* Steering;
 
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* CameraControl;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -84,5 +87,5 @@ private:
 	void ApplyBrake();
 	void ApplySteering(const FInputActionValue& Value);
 	void ApplyFriction(float DeltaTime);
-	void Tilt();
+	void ApplyCameraControl(const FInputActionValue& Value);
 };

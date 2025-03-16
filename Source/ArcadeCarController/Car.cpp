@@ -43,6 +43,7 @@ void ACar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
         Input->BindAction(Accelerate, ETriggerEvent::Triggered, this, &ACar::ApplyAcceleration);
         Input->BindAction(Brake, ETriggerEvent::Triggered, this, &ACar::ApplyBrake);
         Input->BindAction(Steering, ETriggerEvent::Triggered, this, &ACar::ApplySteering);
+        Input->BindAction(CameraControl, ETriggerEvent::Triggered, this, &ACar::ApplyCameraControl);
     }
 }
 
@@ -70,7 +71,7 @@ void ACar::Tick(float DeltaTime)
     //Friction Forces
     ApplyFriction(DeltaTime);
 
-    GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::White, FString::Printf(TEXT("Car Position: %s"), *GetActorLocation().ToString()));
+    //GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::White, FString::Printf(TEXT("Car Position: %s"), *GetActorLocation().ToString()));
 
 }
 
@@ -200,6 +201,17 @@ void ACar::ApplyFriction(float DeltaTime)
     FVector DragForce = -Velocity.GetSafeNormal() * Speed * FrictionStrength;
 
     CarBody->AddForce(DragForce);
+}
+
+void ACar::ApplyCameraControl(const FInputActionValue& Value)
+{
+    FVector2D InputVector = Value.Get<FVector2D>();
+
+    if (IsValid(Controller)) {
+        //Applies Yaw and Pitch
+        AddControllerYawInput(InputVector.X);
+        AddControllerPitchInput(InputVector.Y);
+    }
 }
 
 
