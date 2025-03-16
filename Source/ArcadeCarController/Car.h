@@ -42,7 +42,7 @@ private:
 
 	//Suspension
 	UPROPERTY(EditAnywhere, Category = "Suspension")
-	float SuspensionRest = 70.0f; //Rest length of suspension
+	float SuspensionRest = 50.0f; //Rest length of suspension
 
 	UPROPERTY(EditAnywhere, Category = "Suspension")
 	float SuspensionStiffness = 50000.0f; //Higher = stiffer suspension
@@ -88,4 +88,5 @@ private:
 	void ApplySteering(const FInputActionValue& Value);
 	void ApplyFriction(float DeltaTime);
 	void ApplyCameraControl(const FInputActionValue& Value);
+	void ApplyWheelRotation(USceneComponent* WheelLocation);
 };

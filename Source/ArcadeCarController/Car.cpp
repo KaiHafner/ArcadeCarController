@@ -7,7 +7,6 @@
 #include <EnhancedInputComponent.h>
 #include <EnhancedInputSubsystems.h>
 
-
 // Sets default values
 ACar::ACar()
 {
@@ -90,6 +89,9 @@ void ACar::ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime)
     //Perform raycast
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, RayStart, RayEnd, ECC_Visibility, QueryParams);
 
+    //Gets Child Comp of Wheels (Wheel mesh)
+    USceneComponent* WheelMesh = WheelLocation->GetChildComponent(0);
+
     if (bHit)
     {
         isGrounded = true;
@@ -103,12 +105,14 @@ void ACar::ApplySuspensionForce(USceneComponent* WheelLocation, float DeltaTime)
 
         CarBody->AddForceAtLocation(Force, WheelLocation->GetComponentLocation());
 
-        DrawDebugLine(GetWorld(), RayStart, HitResult.Location, FColor::Green, false, 0.1f, 0, 2);
+        DrawDebugLine(GetWorld(), WheelLocation->GetComponentLocation(), HitResult.Location, FColor::Green, false, 0.1f, 0, 2);
         DrawDebugPoint(GetWorld(), HitResult.Location, 5, FColor::Red, false, 0.1f);
 
-        DrawDebugDirectionalArrow(GetWorld(), WheelLocation->GetComponentLocation(),
-        WheelLocation->GetComponentLocation() + (Force * 0.001f),
-        100.0f, FColor::Blue, false, 0.1f, 0, 3.0f);
+        DrawDebugDirectionalArrow(GetWorld(), WheelLocation->GetComponentLocation(), WheelLocation->GetComponentLocation() + (Force * 0.001f), 100.0f, FColor::Blue, false, 0.1f, 0, 3.0f);
+
+        //Wheel Mesh Visuals
+        float NewLocation = FMath::FInterpTo(WheelMesh->GetRelativeLocation().Z, -HitResult.Distance + 34, DeltaTime, 10.0f);
+        WheelMesh->SetRelativeLocation(FVector(0, 0, NewLocation));
     }
     else
     {
@@ -212,6 +216,10 @@ void ACar::ApplyCameraControl(const FInputActionValue& Value)
         AddControllerYawInput(InputVector.X);
         AddControllerPitchInput(InputVector.Y);
     }
+}
+
+void ACar::ApplyWheelRotation(USceneComponent* WheelLocation)
+{
 }
 
 
