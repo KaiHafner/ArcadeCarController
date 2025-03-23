@@ -200,11 +200,13 @@ void ACar::ApplySteering(const FInputActionValue& Value)
 
 void ACar::ApplyFriction(float DeltaTime)
 {
-    FVector Velocity = CarBody->GetPhysicsLinearVelocity();
-    float Speed = Velocity.Size();
-    FVector DragForce = -Velocity.GetSafeNormal() * Speed * FrictionStrength;
+    if (isGrounded) {
+        FVector Velocity = CarBody->GetPhysicsLinearVelocity();
+        float Speed = Velocity.Size();
+        FVector DragForce = -Velocity.GetSafeNormal() * Speed * FrictionStrength;
 
-    CarBody->AddForce(DragForce);
+        CarBody->AddForce(DragForce);
+    }
 }
 
 void ACar::ApplyCameraControl(const FInputActionValue& Value)
